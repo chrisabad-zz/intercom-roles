@@ -22,6 +22,7 @@ def update_user(user)
 		intercom_user.custom_data['Status'] = user['Status']
 		intercom_user.save
 	rescue
+		$progress_bar.log "Couldn't find User ID #{user['User ID']}."
 		# Let's just fail silently, shall we?
 	end
 	$progress_bar.increment
@@ -31,19 +32,16 @@ end
 puts 'Importing the list of users.'
 
 users = []
-sites = []
 raw_data = CSV.read(csv_filename, csv_options)
-raw_data.values_at('Site ID', 'User ID', 'Role', 'Status').each do |row|
+raw_data.values_at('User ID', 'Role', 'Status').each do |row|
 	users << {
-		'Site ID' => row[0],
-		'User ID' => row[1],
-		'Role' => row[2],
-		'Status' => row[3]
+		'User ID' => row[0],
+		'Role' => row[1],
+		'Status' => row[2]
 	}
 end
-sites.uniq!
 
-puts "#{users.size} users, across #{sites.size} sites, found in the list."
+puts "#{users.size} users found in the list."
 
 # Update each user with the appropriate role.
 puts 'Updating user roles.'
